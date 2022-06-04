@@ -1,0 +1,515 @@
+--------------------------------
+Spring
+	Spring core
+	Spring AOP		Aspect Oriented Programming
+	Spring DAO		
+			JdbcTemplate
+			HibernateCore
+			CrudRepository
+			JpaRepository
+
+	Spring MVC		
+	Spring Boot
+
+
+
+why spring?
+	bean management
+		life cycle		create, destroy
+			how?	if i create an object, then i am responsible to manage
+				life cycle.
+			now, 	i am not going to create an object of bean (dao)
+				instead i am going to get Bean from spring container
+
+		in case of servlets, i am not creating object of servlet.
+		web container was creating the instance pool
+
+		in case of spring, the bean instance is created by Spring container and is responsible for the life cycle of the bean
+
+	around 20 modules
+	Core Container	
+		heart of the spring fw. 
+		implementation for IOC
+		support for DI
+		maintain objects life cycle
+	Data Access/Integration
+		JDBC
+		ORM
+		JMS		
+		Transaction
+	Web
+		MVC
+	AOP
+		Cross-cutting concerns like transactions, logging, security, etc
+	Instrumentation
+	Testing
+		junit, mock
+
+
+interface Player
+{}
+
+class VideoPlayer implements Player
+{
+}
+class AudioPlayer implements Player
+{
+}
+
+class Car
+{
+	VideoPlayer player=new VideoPlayer();		//tightly coupled
+}
+
+
+class Car
+{
+	Player player;				//loosely coupled
+	public Car(Player player)
+	{
+		this.player=player;
+	}
+	public void setPlayer(Player player)
+	{
+		this.player=player;
+	}
+}
+
+Car suzuki=new Car();
+suzuki.setPlayer(new VideoPlayer());		//allowed
+
+Car hyundai=new Car(new AudioPlayer());		//allowed
+
+what is dependency injection?
+how many ways, DI is possible?
+	1) setter based
+	2) constructor based
+
+
+Spring claims it will  do DI using IOC
+	
+---------------------------------------
+ENVIRONMENT SETUP FOR SPRING
+---------------------------------------
+1) jars / maven dependencies
+   <properties>
+        <springframework.version>4.3.6.RELEASE</springframework.version>
+    </properties>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+2) configuration
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:p="http://www.springframework.org/schema/p"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+</beans>
+
+
+	xml
+	annotation
+
+there should be a bean (java class)
+	instead of creating the bean instance by myself. i want to get bean instance from spring fw
+	for this, we need to configure the bean in xml/annotation
+	i) xml
+		bean.xml
+		<beans>
+			<bean name="maths" class="model.Maths">
+				<property name="no1">
+					<value>20</value>
+				</property>
+				<property name="no2">
+					<value>30</value>
+				</property>
+			</bean>
+		</beans>
+
+
+3) to get bean instance from spring container, we can use
+	BeanFactory
+	or
+	ApplicationContext
+		i) ClassPathXmlApplicationContext
+		ii) AnnotationConfigApplicationContext
+		iii) FileSystemXMLApplicationContext
+
+
+i) value as element
+ii) value as property
+iii) ref as attribute
+
+--------------------
+<bean name="" class="">
+	<property name="">
+		<value></value>
+	</property>
+</bean>
+
+---------------------
+<bean name="" class="">
+	<property name="" value="" />
+</bean>
+-----------------------
+
+<bean name="" class="" p:name="value" />
+
+-----------------------------
+
+
+<bean name="" class="">
+	<property name="">
+		<list>
+			<value></value>
+			<value></value>
+		</list>
+	</property>
+</bean>
+--------------------------------------------
+
+difference between list and set?
+		<bean name="school" class="model.School">
+			<property name="name" value="Velammal School" />
+			<property name="board" value="ICSE" />
+			<property name="studentList">
+				<list>
+					<ref bean="student" />
+					<ref bean="s2" />
+					<ref bean="s3" />
+					<ref bean="s2" />					
+				</list>
+			</property>
+		</bean>
+
+		<bean name="school" class="model.School">
+			<property name="name" value="Velammal School" />
+			<property name="board" value="ICSE" />
+			<property name="studentList">
+				<set>
+					<ref bean="student" />
+					<ref bean="s2" />
+					<ref bean="s3" />
+					<ref bean="s2" />					
+				</set>
+			</property>
+		</bean>
+
+<bean name="" class="">
+	<property name="">
+		<map>
+			<entry key="" value="" />
+			<entry key="">
+				<value></value>
+			</entry>
+		</map>
+	</property>
+</bean>
+
+
+---------------------------------------
+Instead of using xml configuration, 
+	we are going to use annotations
+
+	@Component("maths")
+
+	AnnotationConfigApplicationContext ctx=new AnnotationConfigApplicationContext();
+    	ctx.scan("model");
+    	ctx.refresh();
+    	Maths m= (Maths) ctx.getBean("maths");
+    	m.setNo1(23);
+    	m.setNo2(43);
+    	System.out.println(m);
+
+
+
+-------------------------------------------------------
+1) Book
+	id
+	title
+	Author author;
+2) Author
+	id
+	firstName
+	lastName
+
+
+bean.xml
+	define both book and author beans
+
+
+
+@RestController
+public class MyController
+{
+	@Autowired
+	private EmployeeDAO edao;			//we will configure in bean.xml		hibernate properties
+
+	@GetMapping("/")
+	public void read()
+	{
+		edao.read();
+	}
+	public void read(id)
+	
+	public void update()
+
+	public void delete()
+}
+
+
+
+--------------------------
+Singleton
+Prototype
+
+Life cycle methods
+
+	constructed		life of bean begins only after construction
+	destroyed		life ends before destroy
+
+<dependency>
+<groupId>javax.annotation</groupId>
+<artifactId>javax.annotation-api</artifactId>
+<version>1.3</version>
+</dependency> 
+
+	@PreDestroy		//check this in singleton. Does not invoke in prototype
+	public void doShutDown() {
+		System.out.println( "Inside the destroy method : doShutDown()" );
+	}
+
+
+-------------------
+TasK:
+	1) identify the difference between singleton and prototype 
+		i) display a message in constructor of the bean
+		ii) by getBean() couple of times 
+		
+	
+
+SpEL
+	Spring Expression Language
+
+	in JSP expression language:
+		even inside the String literal	("example"), we can have expressions
+		String str="The sum of ${no1} and ${no2} is ${total}";
+
+
+	
+
+TasK
+	Identify the operators used in SpEL
+	+ 	-	*	/	%	
+	==	!=	>	<	>=	<=	
+	and	or	not
+	+	(concatenation)
+	
+
+Calculation calculation=new Calculation();
+calculation.setNumber(5);
+---------------------------------is done by----------------------------------
+Calculation calculation=new Calculation();  //we will not create an instance of Bean like this in Spring
+StandardEvaluationContext context=new StandardEvaluationContext(calculation);  
+      
+ExpressionParser parser = new SpelExpressionParser();  
+parser.parseExpression("number").setValue(context,"5");  
+
+
+
+-------------------------
+BeanFactory vs ApplicationContext
+	identify the difference between both
+
+
+--------
+
+DriverManagerDataSource
+JdbcTemplate
+
+
+public class JdbcTemplate
+{
+	private DataSource dataSource;
+	//cons
+	//getters
+	//setters
+	public void setDataSource(DataSource dataSource)
+	{
+		this.dataSource=dataSource;
+	}
+}
+
+you need to create VehicleDAO
+	dependency is JdbcTemplate
+
+bean.xml
+	define a bean name="vdao" class="model.VehicleDAO" 
+		property name="jt" ref="jt" />
+
+	below or above, you have <bean name="jt" 			i have already given
+
+public class VehicleDAO				in App.java main, get Bean (vdao)
+{
+	private JdbcTemplate jt;
+
+	read()
+	read(id)
+	create
+	update
+	delete
+}
+
+	<bean name="dmds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@localhost:1522:xe" />
+		<property name="username" value="sys as sysdba" />
+		<property name="password" value="password" />		
+	</bean>
+	
+	<bean name="jt" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dmds" />
+	</bean>
+	
+	<bean name="vdao" class="jag_group_1.spring_jdbc_1.VehicleDAO" autowire="byType">
+		<!-- <property name="jt" ref="jt" /> -->
+	</bean>
+
+
+
+package jag_group_1.spring_jdbc_1;
+
+import java.util.List;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class VehicleDAO {
+	private JdbcTemplate jt;
+	
+	public VehicleDAO() {}
+	public VehicleDAO(JdbcTemplate jt) {
+		super();
+		this.jt = jt;
+	}
+	public JdbcTemplate getJt() {
+		return jt;
+	}
+	public void setJt(JdbcTemplate jt) {
+		this.jt = jt;
+	}
+	public int create(Vehicle vehicle)
+	{
+		return jt.update("INSERT INTO Vehicle VALUES(?, ?,?,?)",vehicle.getId(),vehicle.getName(),vehicle.getType(),vehicle.getCompany());
+	}
+	public List<Vehicle> read()
+	{
+		return jt.query("SELECT * FROM Vehicle", new VehicleRowMapper());
+	}
+	public Vehicle read(int id)
+	{
+		Vehicle vehicle=null;
+		List<Vehicle> vehicles = jt.query("SELECT * FROM Vehicle WHERE id=?", new VehicleRowMapper(),id);
+		if(vehicles.size()==1)
+			vehicle=vehicles.get(0);
+		return vehicle;
+	}
+	public int update(Vehicle vehicle)
+	{
+		return jt.update("UPDATE Vehicle SET name=?, type=?, company=? WHERE id=?",vehicle.getName(),vehicle.getType(),vehicle.getCompany(),vehicle.getId());
+	}
+	public int delete(int id)
+	{
+		return jt.update("DELETE FROM Vehicle WHERE id=?", id);		
+	}
+	
+	public void show()
+	{
+		System.out.println("This is vehicle dao object");
+	}
+}
+
+
+
+
+
+
+
+
+ClassPathXmlApplicationContext ctx=new ClassPathXmlApplicationContext("bean.xml");
+		VehicleDAO vdao=(VehicleDAO) ctx.getBean("vdao");
+		vdao.show();
+//		List<Vehicle> vehicles = vdao.read();
+//		for(Vehicle v:vehicles)
+//			System.out.println(v);
+		
+//		Vehicle vehicle = vdao.read(150);
+//		System.out.println(vehicle);
+		System.out.println("Hello world llll");
+
+//		int no=vdao.create(new Vehicle(152,"Ambassador","Good","Excellent"));
+		
+//		int no=vdao.update(new Vehicle(152,"Ambassador","Good","Old"));
+		
+//		int  no=vdao.delete(152);
+//		System.out.println(no);
+------------
+
+
+
+type attribute:
+----------------
+	class Maths
+	{
+		Maths(int i, int j)
+		{
+		}
+		Maths(float i, float j)
+		{
+		}	
+		Maths(String i, String j)
+		{
+		}
+	}
+
+in bean.xml
+-------
+	<constructor-arg value="20" />
+	<constructor-arg value="30" />
+	
+	which constructor will be invoked?
+
+	ans:	cons with String
+
+	remove the cons with String. Now?
+	and:	first cons from the top
+
+
+Now:
+----
+		<constructor-arg value="20" type="int" />
+		<constructor-arg value="30" type="int" />
+
+==========================
+	Maths(int i, double j)
+	{
+	}
+
+	<constructor-arg value="20.0" />
+	<constructor-arg value="30" />
+
+	notice that even when the order of int and double is wrong, it is automatically found and applied.
+	
+	in order to give clarity:
+	<constructor-arg value="20.0" index="1" />
+	<constructor-arg value="30" index="0" />
